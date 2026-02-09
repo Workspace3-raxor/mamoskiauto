@@ -1,4 +1,6 @@
 
+export type Language = 'it' | 'en';
+
 export interface UserUpload {
   id: string;
   user_id: string;

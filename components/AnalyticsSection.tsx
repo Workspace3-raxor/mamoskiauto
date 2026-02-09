@@ -1,12 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Calendar, BarChart3, Clock, LayoutGrid, CheckCircle, Database, Loader2, ArrowUpRight } from 'lucide-react';
+import { Calendar, BarChart3, Clock, CheckCircle, Database, Loader2, ArrowUpRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { UserUpload } from '../types';
+import { UserUpload, Language } from '../types';
 import { SOCIAL_PLATFORMS } from '../constants';
+import { translations } from '../translations';
 
-export const AnalyticsSection: React.FC = () => {
+interface AnalyticsSectionProps {
+  lang: Language;
+}
+
+export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ lang }) => {
   const [uploads, setUploads] = useState<UserUpload[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -14,6 +19,8 @@ export const AnalyticsSection: React.FC = () => {
     totalAllTime: 0,
     platformData: [] as any[]
   });
+
+  const t = translations[lang].analytics;
 
   useEffect(() => {
     fetchData();
@@ -38,7 +45,7 @@ export const AnalyticsSection: React.FC = () => {
         processStats(data);
       }
     } catch (err) {
-      console.error('Data Fetch Error:', err);
+      console.error('Telemetry Error:', err);
     } finally {
       setLoading(false);
     }
@@ -71,64 +78,57 @@ export const AnalyticsSection: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-[70vh] flex flex-col items-center justify-center text-slate-600 gap-6">
-        <div className="relative">
-          <Loader2 className="animate-spin text-blue-500" size={60} strokeWidth={1} />
-          <div className="absolute inset-0 bg-blue-500/20 blur-[20px] rounded-full animate-pulse"></div>
-        </div>
-        <p className="mono text-xs uppercase tracking-[0.4em] font-black">Syncing Intelligence Grid...</p>
+      <div className="h-[60vh] flex flex-col items-center justify-center text-zinc-400 gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={32} />
+        <p className="text-[10px] uppercase tracking-[0.3em] font-black">{t.syncingTelemetry}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-       <div className="space-y-2">
-          <div className="flex items-center gap-3 text-purple-500 font-black text-[10px] uppercase tracking-[0.4em] mb-4">
-            Briefing ID: {(Math.random() * 10000).toFixed(0)}
+    <div className="space-y-8 animate-in fade-in duration-500">
+       <div className="space-y-1">
+          <div className="flex items-center gap-2 text-blue-600 font-black text-[9px] uppercase tracking-[0.4em] mb-1">
+            {t.systemTelemetry}
           </div>
-          <h2 className="text-6xl font-black text-white tracking-tighter leading-none">Intelligence Brief</h2>
-          <p className="text-slate-500 text-xl font-medium tracking-tight">Real-time telemetry and cross-platform performance metrics.</p>
+          <h2 className="text-4xl font-black text-zinc-900 tracking-tighter uppercase leading-none italic">{t.intelBrief}</h2>
+          <p className="text-zinc-500 text-sm font-medium tracking-tight">{t.subtitle}</p>
         </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Current Cycle', val: stats.totalMonth, icon: Calendar, color: 'text-blue-500' },
-          { label: 'System Lifetime', val: stats.totalAllTime, icon: Database, color: 'text-purple-500' },
-          { label: 'Encryption Sync', val: 'Active', icon: CheckCircle, color: 'text-emerald-500' }
+          { label: t.currentCycle, val: stats.totalMonth, icon: Calendar, color: 'text-blue-600' },
+          { label: t.allTimeRelay, val: stats.totalAllTime, icon: Database, color: 'text-zinc-900' },
+          { label: t.integrity, val: '100%', icon: CheckCircle, color: 'text-emerald-600' }
         ].map((item, idx) => (
-          <div key={idx} className="command-surface p-10 rounded-[2.5rem] space-y-4 group hover:scale-[1.03] transition-all duration-500">
+          <div key={idx} className="bg-white border border-zinc-200 p-6 rounded-xl space-y-3 group hover:border-blue-200 transition-colors">
             <div className={`flex items-center justify-between ${item.color}`}>
-              <item.icon size={24} strokeWidth={2.5} />
-              <ArrowUpRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              <item.icon size={18} />
+              <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="text-5xl font-black text-white tracking-tighter mono">{item.val}</div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">{item.label}</p>
+            <div className="text-3xl font-black text-zinc-900 tracking-tighter mono">{item.val}</div>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">{item.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-7 command-surface p-10 rounded-[3rem] space-y-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
-                <BarChart3 size={24} />
-              </div>
-              <h3 className="text-2xl font-black text-white tracking-tight uppercase">Platform Density</h3>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 bg-white border border-zinc-200 p-8 rounded-2xl space-y-8">
+          <div className="flex items-center gap-3">
+            <BarChart3 size={18} className="text-blue-600" />
+            <h3 className="text-sm font-black text-zinc-900 tracking-widest uppercase">{t.platformDist}</h3>
           </div>
-          <div className="h-80 w-full">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.platformData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="name" stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="#475569" fontSize={10} fontWeight="bold" tickLine={false} axisLine={false} dx={-10} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} fontWeight="black" tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="#94a3b8" fontSize={9} fontWeight="black" tickLine={false} axisLine={false} dx={-10} />
                 <Tooltip 
-                  cursor={{fill: 'rgba(255,255,255,0.03)'}}
-                  contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '16px', color: '#f8fafc', fontWeight: 'bold' }}
+                  cursor={{fill: '#f8fafc'}}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '10px', color: '#18181b', fontWeight: 'bold' }}
                 />
-                <Bar dataKey="count" radius={[8, 8, 8, 8]} barSize={40}>
+                <Bar dataKey="count" radius={[4, 4, 4, 4]} barSize={32}>
                   {stats.platformData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -138,41 +138,39 @@ export const AnalyticsSection: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-5 command-surface p-10 rounded-[3rem] space-y-10">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
-              <Clock size={24} />
-            </div>
-            <h3 className="text-2xl font-black text-white tracking-tight uppercase">Recent Relay Logs</h3>
+        <div className="lg:col-span-5 bg-white border border-zinc-200 p-8 rounded-2xl space-y-8 overflow-hidden">
+          <div className="flex items-center gap-3">
+            <Clock size={18} className="text-zinc-400" />
+            <h3 className="text-sm font-black text-zinc-900 tracking-widest uppercase">{t.liveLogs}</h3>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4 max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
             {uploads.map((upload) => (
-              <div key={upload.id} className="flex items-center justify-between group cursor-default">
-                <div className="space-y-1">
-                  <div className="text-sm font-black text-slate-200 uppercase tracking-wide group-hover:text-blue-400 transition-colors truncate max-w-[180px]">
+              <div key={upload.id} className="flex items-center justify-between border-b border-zinc-50 pb-3 group">
+                <div className="space-y-0.5 min-w-0">
+                  <div className="text-[10px] font-black text-zinc-800 uppercase tracking-wide truncate pr-4">
                     {upload.filename}
                   </div>
-                  <div className="text-[9px] mono text-slate-600 font-bold uppercase tracking-widest">
-                    TS: {new Date(upload.uploaded_at).toLocaleTimeString()} / {new Date(upload.uploaded_at).toLocaleDateString()}
+                  <div className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
+                    {new Date(upload.uploaded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • RELAY-SYNC
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-2">
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex -space-x-1.5">
                     {upload.platforms.map((p, i) => (
-                      <div key={i} className="w-5 h-5 rounded-full bg-slate-800 border-2 border-slate-900 text-[8px] font-black flex items-center justify-center text-white uppercase shadow-lg">
+                      <div key={i} className="w-4 h-4 rounded-full bg-zinc-100 border border-white text-[7px] font-black flex items-center justify-center text-zinc-900 uppercase">
                         {p.charAt(0)}
                       </div>
                     ))}
                   </div>
-                  <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${upload.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                  <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${upload.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                     {upload.status}
                   </div>
                 </div>
               </div>
             ))}
             {uploads.length === 0 && (
-              <div className="py-20 text-center text-slate-600 mono text-[10px] uppercase tracking-[0.3em] font-black italic">
-                Logs Empty. Awaiting First Deployment.
+              <div className="py-12 text-center text-zinc-300 text-[9px] uppercase tracking-widest font-black italic">
+                {t.logEmpty}
               </div>
             )}
           </div>

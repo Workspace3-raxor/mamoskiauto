@@ -1,15 +1,24 @@
 
 import React, { useState } from 'react';
-import { Mail, Lock, Radio, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, Radio, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from './Button';
+import { Language } from '../types';
+import { translations } from '../translations';
 
-export const Auth: React.FC = () => {
+interface AuthProps {
+  lang: Language;
+  onLangChange: (lang: Language) => void;
+}
+
+export const Auth: React.FC<AuthProps> = ({ lang, onLangChange }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const t = translations[lang].auth;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +32,7 @@ export const Auth: React.FC = () => {
       } else {
         const { error: signUpError } = await supabase.auth.signUp({ email, password });
         if (signUpError) throw signUpError;
-        alert('Check your email for the confirmation link!');
+        alert(t.verificationSent);
       }
     } catch (err: any) {
       setError(err.message);
@@ -33,79 +42,90 @@ export const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full animate-pulse" />
-
-      <div className="w-full max-w-md z-10">
-        <div className="text-center space-y-4 mb-10">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-blue-500/20 float">
-            <Radio className="text-white" size={32} />
+    <div className="min-h-screen bg-[#f5f5f0] flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-sm">
+        <div className="text-center space-y-3 mb-8">
+          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto shadow-lg">
+            <Radio className="text-white" size={24} />
           </div>
           <div>
-            <h1 className="text-4xl font-extrabold text-white tracking-tight">
-              {isLogin ? 'Welcome back' : 'Get started'}
+            <h1 className="text-2xl font-black text-zinc-900 tracking-tight uppercase">
+              {t.title}
             </h1>
-            <p className="text-slate-400 mt-2">
-              {isLogin ? 'Log in to your business dashboard' : 'Create an account for your business'}
+            <p className="text-zinc-500 text-sm font-medium mt-1">
+              {t.subtitle}
             </p>
           </div>
         </div>
 
-        <div className="glass p-8 rounded-[2rem] shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-400 flex items-center gap-2 px-1">
-                <Mail size={14} /> Email Address
+        <div className="bg-white border border-zinc-200 p-8 rounded-2xl shadow-sm space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                <Mail size={12} /> {t.emailLabel}
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3.5 text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                placeholder="name@business.com"
+                className="w-full bg-zinc-50 border border-zinc-100 rounded-lg p-3 text-zinc-900 outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                placeholder="operator@nexus.com"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-400 flex items-center gap-2 px-1">
-                <Lock size={14} /> Password
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                <Lock size={12} /> {t.passLabel}
               </label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3.5 text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-zinc-50 border border-zinc-100 rounded-lg p-3 text-zinc-900 outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+              <div className="p-2.5 bg-red-50 border border-red-100 rounded-lg text-red-600 text-[11px] font-bold text-center">
                 {error}
               </div>
             )}
 
-            <Button type="submit" className="w-full py-4 text-md" isLoading={isLoading}>
-              {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight size={18} />
+            <Button type="submit" className="w-full py-3.5 text-sm uppercase tracking-widest font-black" isLoading={isLoading}>
+              {isLogin ? t.loginBtn : t.registerBtn} <ArrowRight size={16} className="ml-1" />
             </Button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-slate-800 text-center">
+          <div className="pt-4 border-t border-zinc-100 flex flex-col items-center gap-4">
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
+              className="text-zinc-400 hover:text-blue-600 transition-colors text-[11px] font-bold uppercase tracking-wider"
             >
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              {isLogin ? t.requestAccess : t.existingNode}
             </button>
+
+            <div className="flex gap-2">
+               <button 
+                onClick={() => onLangChange('it')}
+                className={`text-[9px] font-black px-2 py-1 rounded transition-colors ${lang === 'it' ? 'bg-blue-600 text-white' : 'text-zinc-400'}`}
+               >
+                 ITALIANO
+               </button>
+               <button 
+                onClick={() => onLangChange('en')}
+                className={`text-[9px] font-black px-2 py-1 rounded transition-colors ${lang === 'en' ? 'bg-blue-600 text-white' : 'text-zinc-400'}`}
+               >
+                 ENGLISH
+               </button>
+            </div>
           </div>
         </div>
 
-        <p className="text-center text-slate-500 text-xs mt-12 px-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy. Built for high-growth businesses.
+        <p className="text-center text-zinc-400 text-[9px] font-bold uppercase tracking-[0.3em] mt-10">
+          {t.footer}
         </p>
       </div>
     </div>
