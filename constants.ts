@@ -3,7 +3,7 @@ import { PlatformConfig } from './types';
 
 export const SUPABASE_URL = 'https://gvutmajrtnvkypflhdvb.supabase.co';
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2dXRtYWpydG52a3lwZmxoZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2NjE4NDgsImV4cCI6MjA4NTIzNzg0OH0.sovs2ZvFErHXr4bFBcmvsA_cCPnnSbTQ_3WouQ5jiK8';
-export const WEBHOOK_URL = 'https://mamoski.app.n8n.cloud/webhook/file-upload';
+export const WEBHOOK_URL = 'https://n8n.eurosloutions.cloud/webhook/file-upload';
 
 export interface ExtendedPlatformConfig extends PlatformConfig {
   accounts?: string[];
